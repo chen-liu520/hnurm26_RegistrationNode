@@ -67,7 +67,7 @@ namespace hnurm
         void initial_pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);
         void load_pcd_map(const std::string &map_path);
         void timer_callback();
-        // void timer_pub_tf_callback();
+        void status_from_decision_callback(const std_msgs::msg::String::SharedPtr msg);
 
         void relocalization(pcl::PointCloud<pcl::PointXYZ>::Ptr current_sum_cloud_);
         void reset();
@@ -90,6 +90,7 @@ namespace hnurm
         rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr pointcloud_sub_;
         // rclcpp::Subscription<hnurm_interfaces::msg::VisionRecvData>::SharedPtr recv_sub_;
         rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr init_pose_sub_; // 订阅rviz发布的初始位姿
+        rclcpp::Subscription<std_msgs::msg::String>::SharedPtr status_from_decision_sub_; // 订阅决策节点发布的状态，用于决策发过来过完起伏路段之后reset
 
         rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pointcloud_registered_pub_; // 发布配准后的点云
         rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pointcloud_pub_; // 发布降采样的全局点云
@@ -145,6 +146,7 @@ namespace hnurm
 
         // small_gicp参数
         std::string pointcloud_sub_topic_;
+        std::string decision_reset_topic_;
         std::string pcd_file_;
         std::string downsampled_pcd_file_;
 
@@ -202,7 +204,7 @@ namespace hnurm
 
         std::future<void> quatro_future_;
         std::atomic<bool> is_QUAandGICP_running_{false};
-        std::mutex accumulation_mutex_; // ✅ 应该是 mutex
+        std::mutex accumulation_mutex_; // 应该是 mutex
 
         /*********************************成员变量 end*******************************/
 

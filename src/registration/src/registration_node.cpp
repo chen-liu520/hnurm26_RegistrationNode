@@ -10,6 +10,7 @@ namespace hnurm
 
         /***********1. 参数读取***************/
         pointcloud_sub_topic_ = this->declare_parameter("pointcloud_sub_topic", "/cloud_registered");
+        decision_reset_topic_ = this->declare_parameter("decision_reset_topic", "/change_registration_status");
 
         pcd_file_ = this->declare_parameter("pcd_file", "/home/rm/nav/src/hnunavigation_-ros2/hnurm_perception/PCD/all_raw_points.pcd");
         generate_downsampled_pcd_ = this->declare_parameter("generate_downsampled_pcd", false);
@@ -116,6 +117,11 @@ namespace hnurm
             rclcpp::SensorDataQoS(),
             std::bind(&RelocationNode::initial_pose_callback, this, std::placeholders::_1));
 
+        status_from_decision_sub_ = this->create_subscription<std_msgs::msg::String>(
+            decision_reset_topic_,
+            rclcpp::SensorDataQoS(),
+            std::bind(&RelocationNode::status_from_decision_callback, this, std::placeholders::_1));
+
         // publishers
         // 发布降采样的全局点云
         pointcloud_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("/global_pcd_map", 10);
@@ -214,6 +220,11 @@ namespace hnurm
         }
     }
 
+    void RelocationNode::status_from_decision_callback(const std_msgs::msg::String::SharedPtr msg){
+        if(msg->data == "RESET"){
+            reset();
+        }
+    }
     void RelocationNode::timer_callback()
     {
         if (cloud_) // test reading pcd
