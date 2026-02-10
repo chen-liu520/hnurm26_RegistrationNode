@@ -1,0 +1,12 @@
+# Build and install directories
+build/
+install/
+log/
+
+# IDE settings - root directory
+.vscode/
+.marscode/
+
+# IDE settings - subdirectories
+**/src/registration/.vscode/
+**/src/registration/.marscode/
