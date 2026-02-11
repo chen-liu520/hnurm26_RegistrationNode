@@ -216,7 +216,8 @@ namespace hnurm
                 GICP_tracking(msg);
             }
         }else{
-            RCLCPP_ERROR(get_logger(), "正在初始化配准中，当前点云被丢弃");
+            RCLCPP_ERROR(get_logger(), "正在初始化/RESET单线程配准中，当前点云被丢弃，但是【traking】阶段滑动队列还需要更新");
+            update_deque_when_registration_thread_running(msg);
         }
     }
 
@@ -238,6 +239,31 @@ namespace hnurm
         status_pub_->publish(status_msg);
         
     }
+
+    void RelocationNode::update_deque_when_registration_thread_running(sensor_msgs::msg::PointCloud2::SharedPtr msg)
+    {
+        RCLCPP_INFO(this->get_logger(), "update_deque_when_registration_thread_running:: 单线程运行时，滑动队列更新");
+        auto current_cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
+        pcl::fromROSMsg(*msg, *current_cloud);
+        if (!is_queue_full_)
+        {
+            track_slide_window_clouds_queue.push_back(current_cloud);
+            if (track_slide_window_clouds_queue.size() >= static_cast<size_t>(track_accumulation_counter_))
+            {
+                // 划定窗口大小
+                is_queue_full_ = true;
+            }
+            return;
+        }
+        else
+        {
+            // 滑动窗口核心：每接到新的一帧，剔除最开始的一帧，补充新的一帧，保持窗口大小不变后加和
+            track_slide_window_clouds_queue.pop_front();
+            track_slide_window_clouds_queue.push_back(current_cloud);
+            RCLCPP_INFO(this->get_logger(), "GICP_tracking 滑动窗口已更新，当前窗口大小：%ld", track_slide_window_clouds_queue.size());
+        }
+    }
+
 
     void RelocationNode::relocalization(pcl::PointCloud<pcl::PointXYZ>::Ptr current_sum_cloud_)
     {

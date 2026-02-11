@@ -68,6 +68,7 @@ namespace hnurm
         void load_pcd_map(const std::string &map_path);
         void timer_callback();
         void status_from_decision_callback(const std_msgs::msg::String::SharedPtr msg);
+        void update_deque_when_registration_thread_running(sensor_msgs::msg::PointCloud2::SharedPtr msg);
 
         void relocalization(pcl::PointCloud<pcl::PointXYZ>::Ptr current_sum_cloud_);
         void reset();
