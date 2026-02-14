@@ -1,0 +1,37 @@
+/**:
+  ros__parameters:
+    pointcloud_sub_topic: "/cloud_registered" #去畸变点云
+    vision_topic: "/vision_recv_data"
+    pcd_file: "/home/rm/nav/src/hnunavigation_-ros2/hnurm_perception/PCD/all_raw_points.pcd"
+    downsampled_pcd_file_: "/home/rm/nav/src/hnunavigation_-ros2/hnurm_perception/PCD/downsampled.pcd"
+    # 降采样，减少点云数量，提高配准速度
+    generate_downsampled_pcd : false   # please turn this off when using registration
+
+    # small_gicp 配准参数
+    num_threads: 7
+    num_neighbors: 20
+    max_dist_sq: 0.5
+    source_voxel_size: 0.25
+    map_voxel_size: 0.25
+
+    #initial guess
+    self_blue:
+      initial_pose: [0.0,0.0,0.0,  0.0,0.0,0.0,1.0]
+    self_red:
+      initial_pose: [0.0,0.0,0.0,  0.0,0.0,0.0,1.0]
+
+    #method selector
+    use_fixed: true    # 是否使用固定的初始位姿，默认是false
+    use_quatro: true
+
+    #quatro params
+    m_rotation_max_iter: 200
+    m_num_max_corres: 100 
+    m_normal_radius: 0.5 
+    m_fpfh_radius: 1.2 
+    m_distance_threshold: 30.0 
+    m_noise_bound: 0.2 
+    m_rotation_gnc_factor: 1.39 
+    m_rotation_cost_thr: 0.0001 
+    m_estimate_scale: false 
+    m_use_optimized_matching: true 
