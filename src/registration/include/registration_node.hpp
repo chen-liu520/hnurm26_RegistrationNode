@@ -120,11 +120,6 @@ namespace hnurm
         pcl::PointCloud<pcl::PointCovariance>::Ptr source_cloud_PointCovariance_; // gicp配准原
 
         /*********2. 位姿相关 ***************/
-        // geometry_msgs::msg::Transform self_blue_trans_; // initial pose
-        // geometry_msgs::msg::Transform self_red_trans_;
-
-        // bool is_initialized_ = false;                   // fixed=true时，用在recv_sub_callback回调里
-        // std::vector<Eigen::Isometry3d> guesses_;        // 十个位姿猜测，是函数generate_initial_guesses的结果
         Eigen::Isometry3d initial_guess_ = Eigen::Isometry3d::Identity(); // 来自quatro++或者initial_pose_callback
 
         geometry_msgs::msg::TransformStamped transform; // map -> odom变换存放，标准类型的transform，用于发布tf
@@ -151,11 +146,12 @@ namespace hnurm
         std::string pcd_file_;
         std::string downsampled_pcd_file_;
 
-        int num_threads_;
-        int num_neighbors_;
-        float max_dist_sq_;
+        int gicp_num_threads_;
+        int gicp_num_neighbors_;
+        float gicp_max_dist_sq_;
         int gicp_max_iterations_;           // 最大迭代次数（默认通常是30-50）
-        float gicp_convergence_tolerance_;  // 收敛阈值（默认1e-4）
+        float gicp_convergence_translation_tolerance_;  // 平移收敛阈值（单位：m）
+        float gicp_convergence_rotation_tolerance_;    // 旋转收敛阈值（单位：rad）
         float gicp_voxel_size_;             // gicp配准降采样体素大小
         float quatro_voxel_size_;           // quatro++降采样体素大小
         float map_voxel_size_;
@@ -163,8 +159,6 @@ namespace hnurm
         int tracking_frequency_divisor_;    // 跟踪阶段每收到几帧进行一次gicp，用于控制gicp频率，控制资源消耗
         int gicp_run_counter_ = 0;          // gicp运行次数，配合上面的阈值，用于控制gicp频率
 
-        // bool use_quatro_ = false;
-        // bool use_fixed_ = false;
 
         // quatro++参数
         int m_rotation_max_iter_ = 100,
