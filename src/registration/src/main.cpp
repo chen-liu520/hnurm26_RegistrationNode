@@ -1,4 +1,4 @@
-#include "registration_node.hpp"
+#include "registration/registration_node.hpp"
 #include <rclcpp/rclcpp.hpp>
 #include <memory>
 

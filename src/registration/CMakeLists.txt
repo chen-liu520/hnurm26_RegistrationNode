@@ -1,4 +1,18 @@
 cmake_minimum_required(VERSION 3.8)
+
+# ============================================================================
+# KIMICODE: 修复 CMP0074 策略警告
+# ============================================================================
+# 问题描述: CMake 检测到 PCL_ROOT 环境变量，但策略 CMP0074 未设置
+#           导致 find_package 忽略 <PackageName>_ROOT 变量，产生开发者警告
+# 解决方案: 显式设置 CMP0074 为 NEW，使 find_package 正确使用 PCL_ROOT
+# 参考资料: cmake --help-policy CMP0074
+# ============================================================================
+if(POLICY CMP0074)
+  cmake_policy(SET CMP0074 NEW)
+endif()
+# ============================================================================
+
 project(registration)
 
 set(CMAKE_CXX_STANDARD 17)   # 设置 C++ 标准为 C++17，且强制要求支持
@@ -20,7 +34,6 @@ ament_auto_find_build_dependencies(REQUIRED
   geometry_msgs
   pcl_ros
   quatro
-  hnurm_interfaces
 )
 find_package(PCL REQUIRED)
 find_package(OpenMP REQUIRED)
@@ -51,11 +64,22 @@ target_link_libraries(registration_node
   #pcl_ros::pcl_ros
 )
 
+# ============================================================================
+# KIMICODE: 修复头文件安装路径建议警告
+# ============================================================================
+# 问题描述: ament_auto_package 默认将头文件安装到 include/
+#           但 ROS 2 Kilted Kaiju+ 推荐安装到 include/registration/ 以支持 scoped include
+#           即: #include <registration/header.hpp> 而非 #include <header.hpp>
+# 解决方案: 使用 USE_SCOPED_HEADER_INSTALL_DIR 选项启用 scoped 安装路径
+#           在 Kilted 之前版本，此选项显式启用新行为；Kilted+ 将成为默认
+# ============================================================================
 ament_auto_package(
+        USE_SCOPED_HEADER_INSTALL_DIR  # 【KIMICODE】: 启用 scoped 头文件安装路径
         INSTALL_TO_SHARE
         launch   # 安装 launch 文件夹
         params   # 安装 params 文件夹
         rviz     # 安装 rviz 配置文件夹
 )
+# ============================================================================
 
 

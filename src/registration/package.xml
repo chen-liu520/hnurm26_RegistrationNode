@@ -27,7 +27,7 @@
   <!-- 消息 -->
   <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
-  <depend>hnurm_interfaces</depend>
+  <depend>std_srvs</depend>
 
   <!-- 配准库 -->
   <depend>quatro</depend>
